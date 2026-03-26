@@ -5,11 +5,9 @@ import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 import pandas as pd
 import datetime as dt
-
 from typing import Optional
 
-COUNTRIES = {'Italy': 'IT', 'United Kingdom': 'GB', 'Morocco': 'MA',
-             'Brazil': 'BR', 'Russia': 'RU', 'Australia': 'AU'}
+from analysis.constants import COUNTRIES
 
 class COVIDAnalysis:
     def __init__(self, country_name: str) -> None:

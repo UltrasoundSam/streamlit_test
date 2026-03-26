@@ -2,7 +2,7 @@ import streamlit as st
 from collections.abc import Iterable
 
 
-from analysis import COVIDAnalysis
+from analysis.covid_analysis import COVIDAnalysis
 
 
 def render_country_selector(countries: Iterable[str]) -> st.selectbox:
@@ -29,7 +29,7 @@ def render_results(analysis: COVIDAnalysis, country: str) -> None:
         total_cases = analysis.optimum_params[0]
         msg = (
             f'Using this very basic analysis, we expect there to be a total'
-            f'of {int(total_cases):,} cases of COVID in {country}'
+            f' of {int(total_cases):,} cases of COVID in {country}'
         )
 
         # Add vertical spacing
