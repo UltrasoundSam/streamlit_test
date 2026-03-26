@@ -3,6 +3,7 @@ from collections.abc import Iterable
 
 
 from analysis.covid_analysis import COVIDAnalysis
+from analysis.constants import DEFAULT_COUNTRY
 
 
 def render_country_selector(countries: Iterable[str]) -> st.selectbox:
@@ -10,9 +11,12 @@ def render_country_selector(countries: Iterable[str]) -> st.selectbox:
     '''
     st.subheader('Select Country')
 
+    sorted_countries = sorted(countries)
+
     # Create dropdown select box with countries sorted
     return st.selectbox('What Country would you like to explore?',
-                        sorted(countries))
+                        sorted_countries,
+                        index=sorted_countries.index(DEFAULT_COUNTRY))
 
 
 def render_results(analysis: COVIDAnalysis, country: str) -> None:
