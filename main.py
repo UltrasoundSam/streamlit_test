@@ -7,14 +7,13 @@ from analysis.constants import COUNTRIES
 from layout.main_layout import render_country_selector, render_results, render_context
 
 
-DATA_PATH = os.path.join('.', 'WHO-COVID-19-global-daily-data.csv')
+DATA_PATH = 'WHO-COVID-19-global-daily-data.csv'
 
 # MUST be the first Streamlit command
 st.set_page_config(
     page_title="COVID Data Explorer",
     page_icon="📈"  #, layout="wide"
 )
-
 
 st.title('Processing COVID Data')
 
