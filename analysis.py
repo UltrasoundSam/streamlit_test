@@ -1,13 +1,15 @@
 import numpy as np
 import numpy.typing as npt
 import scipy.optimize as so
+import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 import pandas as pd
 import datetime as dt
 
 from typing import Optional
-from collections.abc import Iterable
 
+COUNTRIES = {'Italy': 'IT', 'United Kingdom': 'GB', 'Morocco': 'MA',
+             'Brazil': 'BR', 'Russia': 'RU', 'Australia': 'AU'}
 
 class COVIDAnalysis:
     def __init__(self, country_name: str) -> None:
@@ -107,7 +109,7 @@ class COVIDAnalysis:
             None - but updates self.cases, self.dates,
         '''
         # Create filters
-        country_name_filter = (total_data['country'] == self.country)
+        country_name_filter = (total_data['country_code'] == COUNTRIES[self.country])
         date_filter1 = (total_data["date_reported"] > "2020-01-01")
         date_filter2 = (total_data["date_reported"] < "2020-06-01")
 
@@ -164,11 +166,14 @@ class COVIDAnalysis:
                   (np.inf, np.inf, np.inf))
 
         # Now we can perform the curve fit
-        covid_fit, covid_covariance = so.curve_fit(f=self._gompertz,
-                                                   xdata=days,
-                                                   ydata=self.cases,
-                                                   p0=initial_guess,
-                                                   bounds=bounds)
+        try:
+            covid_fit, covid_covariance = so.curve_fit(f=self._gompertz,
+                                                       xdata=days,
+                                                       ydata=self.cases,
+                                                       p0=initial_guess,
+                                                       bounds=bounds)
+        except RuntimeError:
+            covid_fit = None
 
         # Update optimal params
         self.__params = covid_fit
@@ -220,6 +225,50 @@ class COVIDAnalysis:
 
         ax.legend()
         return fig, ax
+
+    def visualise_cases_interactive(self) -> go.Figure:
+        '''Creates an interactive version of the case numbers on a
+        graph showing the cumululative number.
+
+        If the curve fit is available, it will plot the curve fit as well.
+
+
+        Inputs:
+            None
+
+        Returns:
+            fig [go.Figure]     - Interactive Plotly graph object
+        '''
+        fig = go.Figure()
+
+        # Plot Case numbers
+        fig.add_trace(go.Scatter(
+            x=self.dates,
+            y=self.cases / 1000,
+            mode='markers',
+            marker=dict(color='#1f77b4', size=6),
+            name='Data'
+        ))
+
+        # If params is not None, we've done a curve fit
+        if self.optimum_params is not None:
+            # Create predicted numbers
+            predicted = self.predict_cases(self.dates)
+            fig.add_trace(go.Scatter(
+                x=self.dates,
+                y=predicted / 1000,
+                mode='lines',
+                line=dict(dash='dash', color='#ff7f0e', width=2),
+                name='Predicted Numbers'
+            ))
+
+        # Layout settings
+        fig.update_layout(
+            title=f'COVID Case numbers in {self.country}',
+            yaxis_title="Cumulative COVID Case numbers (1000s)",
+            xaxis_title="Date"
+        )
+        return fig
 
 
 def convert_to_datetime(numpy_time: np.datetime64) -> dt.datetime:

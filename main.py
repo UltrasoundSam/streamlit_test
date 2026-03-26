@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import os
 
-from analysis import COVIDAnalysis
+from analysis import COVIDAnalysis, COUNTRIES
 
 
 DATE_COLUMN = 'Date_reported'
@@ -40,34 +40,34 @@ def main():
         st.subheader('Raw data')
         st.write(data.head(50))
 
-
-
     # Select Country
     st.subheader('Select Country')
     country = st.selectbox('What Country would you like to explore?',
-                           ("Italy",
-                            "United Kingdom of Great Britain and Northern Ireland",
-                            "Morocco"))
+                           COUNTRIES.keys())
     st.write("You selected:", country)
 
     # Create Analysis object
     analysis = COVIDAnalysis(country)
     analysis.load_data(data)
     analysis.fit_data(initial_guess=None)
-    fig, ax = analysis.visualise_cases()
-    st.pyplot(fig)
 
-    # hist_values = np.histogram(data[DATE_COLUMN].dt.hour,
-    #                            bins=24,
-    #                            range=(0,24))[0]
-    # st.bar_chart(hist_values)
+    # Have two columns
+    col1, col2 = st.columns([3, 1])
 
-    # # Some number in the range 0-23
-    # hour_to_filter = st.slider('hour', 0, 23, 17)
-    # filtered_data = data[data[DATE_COLUMN].dt.hour == hour_to_filter]
+    with col1:
+        # Create interactive plot
+        fig = analysis.visualise_cases_interactive()
+        st.plotly_chart(fig)
 
-    # st.subheader(f'Map of all pickups at {hour_to_filter}:00')
-    # st.map(filtered_data)
+    with col2:
+        # Create textual info
+        total_cases = analysis.optimum_params[0]
+        msg = f'Using this very basic analysis, we expect there to be a total of {int(total_cases):,} cases of COVID in {country}'
+
+        for _ in range(12):
+            st.write("")
+        st.write(msg)
+
 
 if __name__ == "__main__":
     main()
