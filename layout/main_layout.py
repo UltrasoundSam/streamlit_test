@@ -41,3 +41,13 @@ def render_results(analysis: COVIDAnalysis, country: str) -> None:
             st.write("")
 
         st.write(msg)
+
+
+def render_context(path) -> None:
+    '''Creates some markdown text to explain what is happening with
+    the analysis, and what are the caveats and limitations with it.
+    '''
+    with open(path, 'r', encoding='utf-8') as fi:
+        md_text = fi.read()
+
+    st.markdown(md_text)
