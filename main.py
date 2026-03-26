@@ -4,6 +4,7 @@ import numpy as np
 import os
 
 from analysis import COVIDAnalysis, COUNTRIES
+from layout import render_country_selector
 
 
 DATE_COLUMN = 'Date_reported'
@@ -41,9 +42,7 @@ def main():
         st.write(data.head(50))
 
     # Select Country
-    st.subheader('Select Country')
-    country = st.selectbox('What Country would you like to explore?',
-                           COUNTRIES.keys())
+    country = render_country_selector(COUNTRIES.keys())
     st.write("You selected:", country)
 
     # Create Analysis object
