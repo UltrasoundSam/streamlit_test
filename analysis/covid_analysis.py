@@ -274,7 +274,7 @@ def convert_to_datetime(numpy_time: np.datetime64) -> dt.datetime:
     """Converts time from numpy datetime64 object to Python built-in
     datetime object"""
     UNIX_EPOCH = np.datetime64(0, "s")
-    ONE_SECOND = np.datetime64(1, "s")
+    ONE_SECOND = np.timedelta64(1, "s")
     seconds_since_epoch = (numpy_time - UNIX_EPOCH) / ONE_SECOND
 
     return dt.datetime.fromtimestamp(seconds_since_epoch, timezone.utc)
