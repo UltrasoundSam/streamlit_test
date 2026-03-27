@@ -5,9 +5,11 @@ import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 import pandas as pd
 import datetime as dt
+from datetime import timezone
 from typing import Optional
 
 from analysis.constants import COUNTRIES
+
 
 class COVIDAnalysis:
     def __init__(self, country_name: str) -> None:
@@ -16,15 +18,15 @@ class COVIDAnalysis:
         self.__country = country_name
 
         # Want to know start and end date of data
-        self.__start_date = None
-        self.__end_date = None
+        self.__start_date = dt.datetime(2020, 1, 1)
+        self.__end_date = dt.datetime(2020, 6, 1)
 
         # Same with cases and dates
         self.__cases = None
         self.__dates = None
 
         # Optimum parameters
-        self.__params = None
+        self.__params = np.array(3*[np.nan])
 
     def __repr__(self) -> str:
         '''Returns friendly representation of object
@@ -51,10 +53,10 @@ class COVIDAnalysis:
         '''Changes the name of the country and reloads data
         '''
         self.__country = country_name
-        self.read_data(data)
+        self.load_data(data)
 
     @property
-    def start_date(self) -> dt.datetime | None:
+    def start_date(self) -> dt.datetime:
         '''Returns first date of data
         '''
         if not self.__start_date:
@@ -64,7 +66,7 @@ class COVIDAnalysis:
         return convert_to_datetime(self.__start_date)
 
     @property
-    def end_date(self) -> dt.datetime | None:
+    def end_date(self) -> dt.datetime:
         '''Returns first date of data
         '''
         if not self.__end_date:
@@ -74,7 +76,7 @@ class COVIDAnalysis:
         return convert_to_datetime(self.__end_date)
 
     @property
-    def dates(self) -> None | npt.NDArray['datetime64[ns]']:
+    def dates(self) -> None | npt.NDArray[np.datetime64]:
         '''Returns tuple of date objects detailing dates that
         data was collected.
         '''
@@ -88,7 +90,7 @@ class COVIDAnalysis:
         return self.__cases
 
     @property
-    def optimum_params(self) -> None | npt.NDArray[np.float32]:
+    def optimum_params(self) -> npt.NDArray[np.float32]:
         '''Returns the optimum parameters found after
         curve fitting
         '''
@@ -107,12 +109,12 @@ class COVIDAnalysis:
             None - but updates self.cases, self.dates,
         '''
         # Create filters
-        country_name_filter = (total_data['country_code'] == COUNTRIES[self.country])
+        country_name_filter = (total_data['country_code'] == COUNTRIES[self.country])  # noqa: E501
         date_filter1 = (total_data["date_reported"] > "2020-01-01")
         date_filter2 = (total_data["date_reported"] < "2020-06-01")
 
         # Apply filters and assign to internal attributes
-        self.__data = total_data[country_name_filter & date_filter1 & date_filter2]
+        self.__data = total_data[country_name_filter & date_filter1 & date_filter2]  # noqa: E501
         self.__cases = self.__data["cumulative_cases"].values
         self.__dates = self.__data["date_reported"].values
 
@@ -121,7 +123,8 @@ class COVIDAnalysis:
         self.__end_date = self.__dates[-1]
 
     def _gompertz(self, date: float | npt.NDArray[np.float64],
-                  a: float, b: float, c: float) -> float:
+                  a: float, b: float, c: float
+                  ) -> float | npt.NDArray[np.float64]:
         '''Helper function defining gompertz curve in the form of
         a*e^-b^-ct.
 
@@ -132,11 +135,12 @@ class COVIDAnalysis:
             c [float]           - Parameter of c in above curve
 
         Outputs:
-            value [float]       - Value of Gompertz curve evaluated at given date
+            value [float]       - Gompertz curve evaluated at given date
         '''
         return a*np.exp(-b*np.exp(-c*date))
 
-    def fit_data(self, initial_guess: Optional[tuple[float]]) -> None:
+    def fit_data(self,
+                 initial_guess: Optional[tuple[float, float, float]]) -> None:
         '''Perform curve fit on data to find the optimum parameter
         for the Gompertz curve given the COVID data. Optional guesses
         for the parameter can be optionally given.
@@ -156,7 +160,7 @@ class COVIDAnalysis:
 
         # Give default values if no initial values are given
         if not initial_guess:
-            initial_guess = (1, 1, 1)
+            initial_guess = (1., 1., 1.)
 
         # All the parameters should be strictly positive, so can define bounds
         # for curve fit
@@ -179,11 +183,12 @@ class COVIDAnalysis:
     def predict_cases(self,
                       dates: np.datetime64 | npt.NDArray[np.datetime64]
                       ) -> float | npt.NDArray[np.float64]:
-        '''For a given date (or series of dates) it predicts what the expected number
-        of cumulative COVID cases should be
+        '''For a given date (or series of dates) it predicts what the expected
+         number of cumulative COVID cases should be
 
         Inputs:
-            dates [np.datimes] - A single datetime or collection of datetime objects to evaluate curve
+            dates [np.datimes] - A single datetime or collection of datetime
+                                 objects to evaluate curve
 
         Returns:
             cum_cases [float]  - Cumulative number of cases at given dates
@@ -192,11 +197,11 @@ class COVIDAnalysis:
         timestamps = (dates - start_of_year) / np.timedelta64(1, 'D')
         timestamps += 1
 
-        # Now dates are in numeric factor, we can pass it over to gompertz function
+        # Now dates are in numeric factor, we can pass it over to gompertz
         cum_cases = self._gompertz(timestamps, *self.optimum_params)
         return cum_cases
 
-    def visualise_cases(self) -> tuple[plt.figure, plt.axes]:
+    def visualise_cases(self) -> tuple[plt.Figure, plt.Axes]:
         '''Visualises case numbers on a graph showing the cumululative number.
         If the curve fit is available, it will plot the curve fit as well.
 
@@ -219,7 +224,8 @@ class COVIDAnalysis:
         if self.optimum_params is not None:
             # Create predicted numbers
             predicted = self.predict_cases(self.dates)
-            ax.plot(self.dates, predicted/1000., '--', label='Predicted Numbers')
+            ax.plot(self.dates, predicted/1000., '--',
+                    label='Predicted Numbers')
 
         ax.legend()
         return fig, ax
@@ -276,4 +282,4 @@ def convert_to_datetime(numpy_time: np.datetime64) -> dt.datetime:
     ONE_SECOND = np.datetime64(1, 's')
     seconds_since_epoch = (numpy_time - UNIX_EPOCH) / ONE_SECOND
 
-    return dt.datetime.utcfromtimestamp(seconds_since_epoch)
+    return dt.datetime.fromtimestamp(seconds_since_epoch, timezone.utc)

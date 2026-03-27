@@ -17,6 +17,5 @@ def load_data(path: str) -> pd.DataFrame:
     data[DATE_COLUMN] = pd.to_datetime(data[DATE_COLUMN])
 
     # Convert all names to lowercase
-    lowercase = lambda x: str(x).lower()
-    data.rename(lowercase, axis='columns', inplace=True)
+    data.rename(lambda x: str(x).lower(), axis='columns', inplace=True)
     return data

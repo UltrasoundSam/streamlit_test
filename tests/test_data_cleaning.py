@@ -6,10 +6,10 @@ from pathlib import Path
 from analysis.data_loader import load_data
 
 
-# ── Fixtures ──────────────────────────────────────────────────────────────────
+# ── Fixtures ─────────────────────────────────────────────────────────
 
 # A header row matching the real CSV structure
-CSV_HEADER = "Date_reported,Country_code,Country,WHO_region,New_cases,Cumulative_cases,New_deaths,Cumulative_deaths\n"
+CSV_HEADER = "Date_reported,Country_code,Country,WHO_region,New_cases,Cumulative_cases,New_deaths,Cumulative_deaths\n"  # noqa: E501
 
 
 @pytest.fixture
@@ -43,7 +43,7 @@ def csv_with_missing_values(tmp_path: Path) -> str:
 def csv_with_mixed_case_columns(tmp_path: Path) -> str:
     """Column headers with uppercase letters — should all be lowercased."""
     content = (
-        "Date_reported,COUNTRY_CODE,Country,WHO_region,New_cases,Cumulative_cases,New_deaths,Cumulative_deaths\n"
+        CSV_HEADER
         + "2020-01-04,GB,United Kingdom,EUR,100,1000,5,50\n"
     )
     file = tmp_path / "covid_cases_mixed.csv"
@@ -51,7 +51,7 @@ def csv_with_mixed_case_columns(tmp_path: Path) -> str:
     return str(file)
 
 
-# ── Tests ─────────────────────────────────────────────────────────────────────
+# ── Tests ─────────────────────────────────────────────────────────────────
 
 class TestLoadDataReturnsCorrectStructure:
     """Check that the function returns a DataFrame with the expected shape."""
@@ -76,10 +76,11 @@ class TestLoadDataReturnsCorrectStructure:
         result = load_data(valid_csv)
         assert expected_columns == set(result.columns)
 
-    def test_columns_are_lowercased(self, csv_with_mixed_case_columns: str) -> None:
+    def test_columns_are_lowercased(self,
+                                    csv_with_mixed_case_columns: str) -> None:
         result = load_data(csv_with_mixed_case_columns)
         for column in result.columns:
-            assert column == column.lower(), f"Column '{column}' is not lowercase"
+            assert column == column.lower(), f"'{column}' is not lowercase"
 
 
 class TestLoadDataHandlesMissingValues:
@@ -93,18 +94,21 @@ class TestLoadDataHandlesMissingValues:
         result = load_data(csv_with_missing_values)
         assert not result.isnull().values.any()
 
-    def test_missing_new_cases_filled_with_zero(self, csv_with_missing_values: str) -> None:
+    def test_missing_new_cases_filled_with_zero(self,
+                                                csv_with_missing_values: str) -> None:  # noqa: E501
         # Anguilla and Azerbaijan both have blank New_cases in the fixture
         result = load_data(csv_with_missing_values)
         anguilla = result[result['country'] == 'Anguilla']
         assert anguilla['new_cases'].iloc[0] == 0
 
-    def test_missing_new_deaths_filled_with_zero(self, csv_with_missing_values: str) -> None:
+    def test_missing_new_deaths_filled_with_zero(self,
+                                                 csv_with_missing_values: str) -> None:  # noqa: E501
         result = load_data(csv_with_missing_values)
         azerbaijan = result[result['country'] == 'Azerbaijan']
         assert azerbaijan['new_deaths'].iloc[0] == 0
 
-    def test_row_with_no_missing_values_is_unchanged(self, csv_with_missing_values: str) -> None:
+    def test_row_with_no_missing_values_is_unchanged(self,
+                                                     csv_with_missing_values: str) -> None:  # noqa: E501
         # Bangladesh has explicit 0s — fillna should not affect it
         result = load_data(csv_with_missing_values)
         bangladesh = result[result['country'] == 'Bangladesh']
