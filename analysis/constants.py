@@ -5,7 +5,6 @@ COUNTRIES = {
     "Brazil": "BR",
     "Russia": "RU",
     "Australia": "AU",
-    "New Zealand": "NZ"
 }
 
 DEFAULT_COUNTRY = "United Kingdom"

@@ -48,7 +48,7 @@ def render_context(path) -> None:
     """Creates some markdown text to explain what is happening with
     the analysis, and what are the caveats and limitations with it.
     """
-    with open(path, "r", encoding="utf-8") as fi:
-        md_text = fi.read()
-
+    # with open(path, "r", encoding="utf-8") as fi:
+    #     md_text = fi.read()
+    md_text = "Gompertz curves are well-suited to modelling cumulative COVID case numbers because their S-shaped form captures the realistic pattern of outbreaks - slow early growth, rapid exponential rise, and a natural flattening as transmission slows or interventions take effect."  # noqa: E501
     st.markdown(md_text)
