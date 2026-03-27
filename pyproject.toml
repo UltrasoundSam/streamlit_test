@@ -1,6 +1,6 @@
 [project]
 name = "streamlit-app"
-version = "0.3.7"
+version = "0.3.12"
 description = "Example to show off streamlit skillz"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -9,4 +9,10 @@ dependencies = [
     "plotly>=6.6.0",
     "scipy>=1.17.1",
     "streamlit>=1.55.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+    "ruff>=0.15.8",
 ]

@@ -7,16 +7,17 @@ from analysis.constants import DEFAULT_COUNTRY
 
 
 def render_country_selector(countries: Iterable[str]) -> st.selectbox:
-    '''Creates the dropdown list for the country selector
-    '''
-    st.subheader('Select Country')
+    """Creates the dropdown list for the country selector"""
+    st.subheader("Select Country")
 
     sorted_countries = sorted(countries)
 
     # Create dropdown select box with countries sorted
-    return st.selectbox('What Country would you like to explore?',
-                        sorted_countries,
-                        index=sorted_countries.index(DEFAULT_COUNTRY))
+    return st.selectbox(
+        "What Country would you like to explore?",
+        sorted_countries,
+        index=sorted_countries.index(DEFAULT_COUNTRY),
+    )
 
 
 def render_results(analysis: COVIDAnalysis, country: str) -> None:
@@ -32,8 +33,8 @@ def render_results(analysis: COVIDAnalysis, country: str) -> None:
         # Create textual info
         total_cases = analysis.optimum_params[0]
         msg = (
-            f'Using this very basic analysis, we expect there to be a total'
-            f' of {int(total_cases):,} cases of COVID in {country}'
+            f"Using this very basic analysis, we expect there to be a total"
+            f" of {int(total_cases):,} cases of COVID in {country}"
         )
 
         # Add vertical spacing
@@ -44,10 +45,10 @@ def render_results(analysis: COVIDAnalysis, country: str) -> None:
 
 
 def render_context(path) -> None:
-    '''Creates some markdown text to explain what is happening with
+    """Creates some markdown text to explain what is happening with
     the analysis, and what are the caveats and limitations with it.
-    '''
-    with open(path, 'r', encoding='utf-8') as fi:
+    """
+    with open(path, "r", encoding="utf-8") as fi:
         md_text = fi.read()
 
     st.markdown(md_text)

@@ -2,26 +2,27 @@ import streamlit as st
 import os
 
 from analysis.data_loader import load_data
-from analysis.covid_analysis import COVIDAnalysis, COUNTRIES
+from analysis.covid_analysis import COVIDAnalysis
 from analysis.constants import COUNTRIES
-from layout.main_layout import render_country_selector, render_results, render_context
+from layout.main_layout import render_country_selector, render_results, render_context  # noqa: E501
 
 
-DATA_PATH = os.path.join('data', 'WHO-COVID-19-global-daily-data.csv')
+DATA_PATH = os.path.join("data", "WHO-COVID-19-global-daily-data.csv")
 
 # Define page style - must be first streamlit command
 st.set_page_config(
     page_title="COVID Data Explorer",
-    page_icon="📈"  #, layout="wide"
+    page_icon="📈",  # , layout="wide"
 )
 
-st.title('Processing COVID Data')
+st.title("Processing COVID Data")
+
 
 @st.cache_data
 def cached_load():
-    ''' Read in data from file and clean up missing data
-    '''
+    """Read in data from file and clean up missing data"""
     return load_data(DATA_PATH)
+
 
 def main():
     # Render context info
@@ -41,8 +42,8 @@ def main():
     # Create visualisations
     render_results(analysis, country)
 
-    if st.checkbox('Show raw data'):
-        st.write(data[data['country_code'] == COUNTRIES[country]])
+    if st.checkbox("Show raw data"):
+        st.write(data[data["country_code"] == COUNTRIES[country]])
 
 
 if __name__ == "__main__":
