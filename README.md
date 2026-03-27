@@ -4,6 +4,7 @@ This repository provides an example project for teaching Object-Oriented Program
 
 The project is designed for degree apprentices learning how OOP principles can be applied to real-world data workflows.
 
+You can access the dashboard [here](https://ysj-oop.streamlit.app/).
 ---
 
 ## 🚀 Project Overview
@@ -66,3 +67,6 @@ Keeping each part of the project in its own folder makes the code easier to unde
   Acts as the single entry point that ties everything together, making the project easy to run and navigate.
 
 This structure mirrors how real data applications are organised and helps learners see the benefits of modular, well‑designed codebases.
+
+
+![Tests](https://github.com/UltrasoundSam/streamlit_test/actions/workflows/tests.yaml/badge.svg)
