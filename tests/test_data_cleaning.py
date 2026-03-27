@@ -42,16 +42,14 @@ def csv_with_missing_values(tmp_path: Path) -> str:
 @pytest.fixture
 def csv_with_mixed_case_columns(tmp_path: Path) -> str:
     """Column headers with uppercase letters — should all be lowercased."""
-    content = (
-        CSV_HEADER
-        + "2020-01-04,GB,United Kingdom,EUR,100,1000,5,50\n"
-    )
+    content = CSV_HEADER + "2020-01-04,GB,United Kingdom,EUR,100,1000,5,50\n"
     file = tmp_path / "covid_cases_mixed.csv"
     file.write_text(content)
     return str(file)
 
 
 # ── Tests ─────────────────────────────────────────────────────────────────
+
 
 class TestLoadDataReturnsCorrectStructure:
     """Check that the function returns a DataFrame with the expected shape."""
@@ -70,14 +68,19 @@ class TestLoadDataReturnsCorrectStructure:
 
     def test_expected_columns_are_present(self, valid_csv: str) -> None:
         expected_columns = {
-            'date_reported', 'country_code', 'country', 'who_region',
-            'new_cases', 'cumulative_cases', 'new_deaths', 'cumulative_deaths'
+            "date_reported",
+            "country_code",
+            "country",
+            "who_region",
+            "new_cases",
+            "cumulative_cases",
+            "new_deaths",
+            "cumulative_deaths",
         }
         result = load_data(valid_csv)
         assert expected_columns == set(result.columns)
 
-    def test_columns_are_lowercased(self,
-                                    csv_with_mixed_case_columns: str) -> None:
+    def test_columns_are_lowercased(self, csv_with_mixed_case_columns: str) -> None:
         result = load_data(csv_with_mixed_case_columns)
         for column in result.columns:
             assert column == column.lower(), f"'{column}' is not lowercase"
@@ -94,26 +97,29 @@ class TestLoadDataHandlesMissingValues:
         result = load_data(csv_with_missing_values)
         assert not result.isnull().values.any()
 
-    def test_missing_new_cases_filled_with_zero(self,
-                                                csv_with_missing_values: str) -> None:  # noqa: E501
+    def test_missing_new_cases_filled_with_zero(
+        self, csv_with_missing_values: str
+    ) -> None:  # noqa: E501
         # Anguilla and Azerbaijan both have blank New_cases in the fixture
         result = load_data(csv_with_missing_values)
-        anguilla = result[result['country'] == 'Anguilla']
-        assert anguilla['new_cases'].iloc[0] == 0
+        anguilla = result[result["country"] == "Anguilla"]
+        assert anguilla["new_cases"].iloc[0] == 0
 
-    def test_missing_new_deaths_filled_with_zero(self,
-                                                 csv_with_missing_values: str) -> None:  # noqa: E501
+    def test_missing_new_deaths_filled_with_zero(
+        self, csv_with_missing_values: str
+    ) -> None:  # noqa: E501
         result = load_data(csv_with_missing_values)
-        azerbaijan = result[result['country'] == 'Azerbaijan']
-        assert azerbaijan['new_deaths'].iloc[0] == 0
+        azerbaijan = result[result["country"] == "Azerbaijan"]
+        assert azerbaijan["new_deaths"].iloc[0] == 0
 
-    def test_row_with_no_missing_values_is_unchanged(self,
-                                                     csv_with_missing_values: str) -> None:  # noqa: E501
+    def test_row_with_no_missing_values_is_unchanged(
+        self, csv_with_missing_values: str
+    ) -> None:  # noqa: E501
         # Bangladesh has explicit 0s — fillna should not affect it
         result = load_data(csv_with_missing_values)
-        bangladesh = result[result['country'] == 'Bangladesh']
-        assert bangladesh['new_cases'].iloc[0] == 0
-        assert bangladesh['new_deaths'].iloc[0] == 0
+        bangladesh = result[result["country"] == "Bangladesh"]
+        assert bangladesh["new_cases"].iloc[0] == 0
+        assert bangladesh["new_deaths"].iloc[0] == 0
 
 
 class TestLoadDataTypes:
@@ -121,19 +127,19 @@ class TestLoadDataTypes:
 
     def test_new_cases_is_integer(self, valid_csv: str) -> None:
         result = load_data(valid_csv)
-        assert result['new_cases'].dtype == np.int64
+        assert result["new_cases"].dtype == np.int64
 
     def test_new_deaths_is_integer(self, valid_csv: str) -> None:
         result = load_data(valid_csv)
-        assert result['new_deaths'].dtype == np.int64
+        assert result["new_deaths"].dtype == np.int64
 
     def test_date_reported_is_datetime(self, valid_csv: str) -> None:
         result = load_data(valid_csv)
-        assert pd.api.types.is_datetime64_any_dtype(result['date_reported'])
+        assert pd.api.types.is_datetime64_any_dtype(result["date_reported"])
 
     def test_date_values_are_parsed_correctly(self, valid_csv: str) -> None:
         result = load_data(valid_csv)
-        assert result['date_reported'].iloc[0] == pd.Timestamp("2020-01-04")
+        assert result["date_reported"].iloc[0] == pd.Timestamp("2020-01-04")
 
 
 class TestLoadDataEdgeCases:
