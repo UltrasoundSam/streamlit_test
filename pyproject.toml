@@ -1,6 +1,6 @@
 [project]
 name = "streamlit-app"
-version = "0.3.7"
+version = "0.3.8"
 description = "Example to show off streamlit skillz"
 readme = "README.md"
 requires-python = ">=3.12"
