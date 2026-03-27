@@ -7,9 +7,9 @@ from analysis.constants import COUNTRIES
 from layout.main_layout import render_country_selector, render_results, render_context
 
 
-DATA_PATH = 'WHO-COVID-19-global-daily-data.csv'
+DATA_PATH = os.path.join('data', 'WHO-COVID-19-global-daily-data.csv')
 
-# MUST be the first Streamlit command
+# Define page style - must be first streamlit command
 st.set_page_config(
     page_title="COVID Data Explorer",
     page_icon="📈"  #, layout="wide"
@@ -26,6 +26,7 @@ def cached_load():
 def main():
     # Render context info
     render_context(os.path.join("layout", "intro.md"))
+
     # Read in Data
     data = cached_load()
 
