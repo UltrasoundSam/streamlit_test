@@ -21,7 +21,10 @@ def render_country_selector(countries: Iterable[str]) -> st.selectbox:
 
 
 def render_results(analysis: COVIDAnalysis, country: str) -> None:
-    # Have two columns
+    """Renders results (in graphical form) for the COVID analysis
+    for a specific country
+    """
+    # Have two columns - one for graph, one for text
     col1, col2 = st.columns([3, 1])
 
     with col1:
@@ -48,7 +51,7 @@ def render_context(path) -> None:
     """Creates some markdown text to explain what is happening with
     the analysis, and what are the caveats and limitations with it.
     """
-    # with open(path, "r", encoding="utf-8") as fi:
-    #     md_text = fi.read()
-    md_text = "Gompertz curves are well-suited to modelling cumulative COVID case numbers because their S-shaped form captures the realistic pattern of outbreaks - slow early growth, rapid exponential rise, and a natural flattening as transmission slows or interventions take effect."  # noqa: E501
+    with open(path, "r", encoding="utf-8") as fi:
+        md_text = fi.read()
+
     st.markdown(md_text)
