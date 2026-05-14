@@ -16,7 +16,7 @@ $$ \Large f\left(t\right) = a e^{-be^{-ct}} $$
 
 where $a$, $b$ and $c$ are all parameters that describe the shape of the curve. The graph looks similar to a logistic regression curve, with a comparison of the shape shown visually below.
 
-![Gompertz Curve Graph](./layout/Gompertz_Logistic_Comparison.jpg)
+![Gompertz Curve Graph](/layout/Gompertz_Logistic_Comparison.jpg)
 
 I have included a couple of datafiles on the Moodle page, which I have obtained from the World Health Organisation (WHO), I've filtered the data and split it into different files. For the full original dataset, you can navigate to the [WHO website](https://data.who.int/dashboards/covid19/data).
 
